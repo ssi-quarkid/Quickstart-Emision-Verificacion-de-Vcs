@@ -1,35 +1,44 @@
-## Quickstart
+# Quickstart
 
-El objetivo de este Quickstart es registrar los pasos para realizar un proceso de emisión y verficiación de credenciales. 
+The objective of this Quickstart is to record the steps to perform a process of issuing and verifying credentials.
 
-## Emisión y Verificación (Formato código)
-1. [Creación, publicación y resolución de DID](https://github.com/gcba/Quickstart-Emision-Verificacion-de-Vcs/tree/master?tab=readme-ov-file#instala-y-crea-tu-did).
-2. [Creación de Credencial Verificable, de ahora en más VC](https://github.com/gcba/Quickstart-Emision-Verificacion-de-Vcs/tree/master?tab=readme-ov-file#creaci%C3%B3n-de-una-vc-credencial-verificable).
-3. [Verificación de una VC](https://github.com/gcba/Quickstart-Emision-Verificacion-de-Vcs/tree/master?tab=readme-ov-file#verificaci%C3%B3n-de-una-vc).
+## Issuance and Verification (Code Format)
 
-## Emisión (Formato QR)
-1. [Creación y lectura de código QR de Credencial de Prueba](https://github.com/gcba/Quickstart-Emision-Verificacion-de-Vcs/tree/master?tab=readme-ov-file#generaci%C3%B3n-de-credencial-de-pruebas-con-c%C3%B3digo-qr)
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. [Creation, publication, and resolution of DID](#install-and-create-your-did).
+2. [Creation of Verifiable Credential, hereinafter VC](#creation-of-a-vc-verifiable-credential).
+3. [Verification of a VC](#verification-of-a-vc).
 
-### Instala y crea tu DID
-_Pre requisitos_
+## Issuance (QR Format)
 
-Debes tener instalado:
+1. [Creation and reading of QR code for Test Credential](#generation-of-test-credential-with-qr-code)
+
+---
+
+## Install and create your DID
+
+_Prerequisites_
+
+You must have installed:
+
 ```
 NODEJS
 NPM
 TYPESCRIPT
 TS-NODE
 ```
-### 1. Crea un directorio
+
+### 1. Create a directory
+
 ```
 mkdir quarkid-app
-``````
+```
+
 ```
 cd quarkid-app
 ```
 
-### 2. Instala paquetes NPMJs
+### 2. Install NPMJs packages
+
 ```
 npm init
 ```
@@ -38,20 +47,19 @@ npm init
 npm install @quarkid/did-registry @quarkid/did-core @quarkid/kms-client @quarkid/kms-core
 ```
 
-### 3. Crea las claves
+### 3. Create the keys
 
-Para crear un DID necesitas proveer tus claves publicas. Puedes usar el componente KMS para generar tus claves publicas y privadas.
+To create a DID, you need to provide your public keys. You can use the KMS component to generate your public and private keys.
 
-*Key Management Service*: KMS Storage y KMS Keys
+_Key Management Service_: KMS Storage and KMS Keys
 
 ## KMS Storage
 
-KMS aplica conceptos de inversión de dependencias por lo que requiere enviar un SecureStorage en su constructor. En esta oportunidad usaremos FileSystem para guardar los datos y podes acceder a ellos de una manera sencilla.
+KMS applies dependency inversion concepts, so it requires sending a SecureStorage in its constructor. On this occasion, we will use FileSystem to store the data and access it in a simple way.
 
-### 1. Crea un archivo storage.ts con el siguiente codigo
+### 1. Create a storage.ts file with the following code
 
-
-```
+```typescript
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { KMSStorage } from "@quarkid/kms-core";
 
@@ -113,22 +121,22 @@ export class FileSystemKMSSecureStorage implements KMSStorage {
 ```
 
 ## KMS Keys
-  
-### 1. Crea un archivo did.ts.
 
+### 1. Create a did.ts file.
 
-### 2. Importa la siguientes dependecias:
+### 2. Import the following dependencies:
 
-```
+```typescript
 import { FileSystemKMSSecureStorage } from "./storage";
 import { KMSClient } from "@quarkid/kms-client";
 import { LANG, Suite } from "@quarkid/kms-core";
 ```
 
-### 3. Crea una funcion que se llame createDID como se muestra a continuación:
-Crea las claves _recoveryKey, updateKey, bbsBlsJwk y didCommJwk_.
+### 3. Create a function called createDID as shown below:
 
-```
+Create the keys _recoveryKey, updateKey, bbsBlsJwk, and didCommJwk_.
+
+```typescript
 export const createDID = async () => {
   const kms = new KMSClient({
     lang: LANG.en,
@@ -146,22 +154,24 @@ export const createDID = async () => {
 ```
 
 > [!TIP]
-> Para obtener más información sobre KMS, consulte [documentación disponible](https://www.npmjs.com/package/@quarkid/kms-client).
+> For more information about KMS, see the [available documentation](https://www.npmjs.com/package/@quarkid/kms-client).
 
----------------------------------------------------------------------------------------------------------
+---
 
-### 4. Crea un long DID
-Una vez generadas las  generar tus claves publicas y privadas, el siguiente paso es crear un LONG DID.
+### 4. Create a long DID
 
-Con el servicio de creacion de un did podes crear un LONG DID, este es un DID en el que su DID Document se encuentra embebido en la información que devuelve en un formato base64. Es un DID autoresoluble, es decir, desencondeando el base64 se puede obtener su DID Document.
+Once you have generated your public and private keys, the next step is to create a LONG DID.
 
-En el archivo did.ts importa las dependecias y agrega el código que se muestra a continuación.
-```
+With the DID creation service, you can create a LONG DID, which is a DID where its DID Document is embedded in the information it returns in a base64 format. It is a self-resolvable DID, meaning that by decoding the base64, you can obtain its DID Document.
+
+In the did.ts file, import the dependencies and add the code shown below.
+
+```typescript
 import { ModenaUniversalRegistry } from "@quarkid/did-registry";
 import { AssertionMethodPurpose, KeyAgreementPurpose } from "@quarkid/did-core";
 ```
 
-```
+```typescript
 export const createDID = async () => {
   const kms = new KMSClient({
     lang: LANG.en,
@@ -199,18 +209,23 @@ export const createDID = async () => {
   console.log(JSON.stringify(createDidResponse.longDid));
 };
 ```
-Continua con el siguiente paso antes de ejecutar tu código:
-### 5. Publicación de DID 
-Publica tu did en blockchain. Para ello se requiere una URL de la API de QuarkID, que representa un nodo de QuarkID que se ejecuta como un servicio.
-Podes [proporcionar tu propio nodo](https://github.com/gcba/Nodo-QuickStart/tree/master) o utilizar el siguiente: 
 
-### Nodo:
-```
+Continue with the next step before executing your code:
+
+### 5. DID Publication
+
+Publish your DID on the blockchain. This requires a QuarkID API URL, which represents a QuarkID node running as a service.
+You can [provide your own node](https://github.com/ssi-quarkid/Nodo-QuickStart/) or use the following:
+
+### Node:
+
+```typescript
 export const QuarkIDEndpoint = "https://node-ssi.buenosaires.gob.ar";
 ```
 
-### 6. Escribe el siguiente código dentro de la funcion createDID para publicar.
-```
+### 6. Write the following code within the createDID function to publish.
+
+```typescript
 const result = await registry.publishDID({
   universalResolverURL: QuarkIDEndpoint,
   didMethod: "did:quarkid",
@@ -220,25 +235,28 @@ const result = await registry.publishDID({
 console.log("result", result);
 ```
 
-La constante result te devolverá un canonicalId, un short did y un long did que te permitirá luego resolverlo y obtener el Did Document.
+The result constant will return a canonicalId, a short DID, and a long DID that will allow you to later resolve it and obtain the DID Document.
 
-Continúa con el siguiente paso antes de ejecutar tu código.
+Continue with the next step before executing your code.
 
-### 7. Resuelve
-Para resolver tu did instala el siguiente paquete:
+### 7. Resolve
+
+To resolve your DID, install the following package:
+
 ```
 npm install @quarkid/did-resolver
 ```
 
-Dentro del archivo did.ts importa la siguiente dependencia:
-```
+Within the did.ts file, import the following dependency:
+
+```typescript
 import { DIDUniversalResolver } from "@quarkid/did-resolver";
 import { DIDDocument } from "@quarkid/did-core";
 ```
 
-Escribe la siguiente funcion antes de la funcion createDID.
+Write the following function before the createDID function.
 
-```
+```typescript
 export const resolveDid = (did: string) =>
   new Promise<DIDDocument>((resolve, reject) => {
     setTimeout(async () => {
@@ -254,26 +272,31 @@ export const resolveDid = (did: string) =>
   });
 ```
 
-Agrega a la funcion createDID el siguiente codigo:
-```
+Add the following code to the createDID function:
+
+```typescript
 const didDocument = await resolveDid(result.did);
 console.log("Did Document", didDocument);
 ```
-### 8. Prueba tu DID
-Para probar tu codigo deberás llamar a la funcion createDid.
-```
-createDid();
+
+### 8. Test your DID
+
+To test your code, you'll need to call the createDID function.
+
+```typescript
+createDID();
 ```
 
-Si se siguieron los pasos correctamente, deberas tener un archivo did.ts como el siguiente:
-```
+If you followed the steps correctly, you should have a did.ts file like the following:
+
+```typescript
 import { FileSystemKMSSecureStorage } from "./storage";
 import { KMSClient } from "@quarkid/kms-client";
 import { LANG, Suite } from "@quarkid/kms-core";
 import { ModenaUniversalRegistry } from "@quarkid/did-registry";
 import { AssertionMethodPurpose, KeyAgreementPurpose } from "@quarkid/did-core";
 import { DIDUniversalResolver } from "@quarkid/did-resolver";
-import { DIDDocument } from "@extrimian/did-core";
+import { DIDDocument } from "@quarkid/did-core";
 
 export const QuarkIDEndpoint = "https://node-ssi.buenosaires.gob.ar";
 
@@ -340,7 +363,8 @@ export const createDID = async () => {
 
 createDID();
 ```
-El próximo paso es ejecutar la funcion createDID, para ello abre una terminal y usa ts-node ó npx para ejecutar tu código.
+
+The next step is to execute the createDID function. To do this, open a terminal and use ts-node or npx to run your code.
 
 ```
 ts-node did.ts
@@ -351,35 +375,37 @@ npx ts-node did.ts
 ```
 
 > [!NOTE]
-> En tu terminal podrás observar el resultado de los console.log que estan en tu código. La resolución del Did Document demora unos segundos en impactar, esto se debe a que se esta publicando el did en la blockchain y este proceso puede demorar.
+> In your terminal, you will be able to observe the result of the console.log statements in your code. The resolution of the DID Document takes a few seconds to impact, as the DID is being published on the blockchain and this process can take time.
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
-### Creación de una VC (Credencial Verificable)
-El formato de una VC consiste en un Objecto de tipo JSON que contiene indentificadores y metadatos para describir las propiedades de la credencial, como su Emisor, período de validez, imagen representativa, una clave pública para usar con proposito de verificación, mecanismos de revocación, entre otras. Los metadatos pueden estar firmados por el emisor, por lo que su autenticidad podrá ser probada mediante una verificación criptográfica.
-Las credenciales verificables y las presentaciones verificables DEBEN incluir una propiedad @context.
+## Creation of a VC (Verifiable Credential)
 
-En el caso particular de QuarkID las URLs proporcionadas en esta sección, deben ser procesables como JSON-LD.
+The format of a VC consists of a JSON Object that contains identifiers and metadata to describe the properties of the credential, such as its Issuer, validity period, representative image, a public key to use for verification purposes, revocation mechanisms, among others. The metadata can be signed by the issuer, so its authenticity can be proven through cryptographic verification.
+Verifiable credentials and verifiable presentations MUST include an @context property.
 
+In the particular case of QuarkID, the URLs provided in this section must be processable as JSON-LD.
 
-JSON-LD, que significa "JSON Linked Data" (Datos Enlazados en JSON), es una forma de representar datos estructurados utilizando la sintaxis de JSON mientras se incorporan conceptos de Datos Enlazados (Linked Data) para permitir la interoperabilidad semántica en la web.
+JSON-LD, which stands for "JSON Linked Data", is a way of representing structured data using JSON syntax while incorporating Linked Data concepts to allow semantic interoperability on the web.
 
-## 1. Instala
+### 1. Install
+
 ```
 npm install @quarkid/vc-core
 ```
 
-## 2. Crea una credencial
-Para crear tu primer credencial debes tener tu creado un DID y sus claves guardadas en el storage de KMS.
-Con esa tarea realizada, usted puede avanzar. Cree un archivo credential.ts e importa la siguiente dependencia.
+### 2. Create a credential
 
-```
+To create your first credential, you must have created a DID and its keys stored in the KMS storage.
+With that task completed, you can proceed. Create a credential.ts file and import the following dependency.
+
+```typescript
 import { VerifiableCredentialService } from "@quarkid/vc-core";
 ```
 
-## 3. Escribe el siguiente codigo y reemplaza lo que hay en ISSUER por tu DID:
+### 3. Write the following code and replace what's in ISSUER with your DID:
 
-```
+```typescript
 const credential = async () => {
   const vcService = new VerifiableCredentialService();
 
@@ -390,7 +416,7 @@ const credential = async () => {
       "https://w3id.org/security/bbs/v1",
     ],
     vcInfo: {
-      issuer: "REEMPLAZA POR TU DID",
+      issuer: "REPLACE WITH YOUR DID",
       expirationDate: new Date("2026/05/05"),
       id: "123456789",
       types: ["VaccinationCertificate"],
@@ -423,22 +449,24 @@ const credential = async () => {
 };
 ```
 
-Continúa con el siguiente paso antes de ejecutar tu código.
+Continue with the next step before executing your code.
 
-### 4. Firma tu credencial
-Para poder firmar tu credencial debes intanciar el KMS para requerir las claves con las que firmarás tu credencial.
+### 4. Sign your credential
 
-Importa las siguientes dependencias en el archivo credential.ts.
+To be able to sign your credential, you must instantiate the KMS to request the keys with which you will sign your credential.
 
-```
+Import the following dependencies in the credential.ts file.
+
+```typescript
 import { KMSClient } from "@quarkid/kms-client";
 import { LANG, Suite } from "@quarkid/kms-core";
 import { AssertionMethodPurpose } from "@quarkid/did-core";
 import { FileSystemKMSSecureStorage } from "./storage";
 ```
 
-Agrega el siguiente código a la función credential a continuación de lo escrito.
-```
+Add the following code to the credential function after what you've already written.
+
+```typescript
 const kms = new KMSClient({
   lang: LANG.es,
   storage: new FileSystemKMSSecureStorage({
@@ -449,32 +477,35 @@ const kms = new KMSClient({
 const bbsbls2020 = await kms.getPublicKeysBySuiteType(Suite.Bbsbls2020);
 ```
 
-Usamos el algoritmo de claves bbsbls2020 para firmar una credencial ya que nos permite el uso de selective disclousure y zero knowlegde proof.
+We use the bbsbls2020 key algorithm to sign a credential as it allows us to use selective disclosure and zero-knowledge proof.
 
-El kms provee un methodo signVC que nos permite firmar una credencial.
+The KMS provides a signVC method that allows us to sign a credential.
 
-Agrega el siguiente código a la función credential, a continuación de lo escrito anteriormente, pero reemplaza el string "TU DID" con el did que creaste en los pasos enteriores.
+Add the following code to the credential function, after what you've written previously, but replace the string "YOUR DID" with the DID you created in the previous steps.
 
-```
+```typescript
 const vc = await kms.signVC(
   Suite.Bbsbls2020,
   bbsbls2020[0],
   credential,
-  "TU DID",
-  "TU DID" + "#bbsbls",
+  "YOUR DID",
+  "YOUR DID" + "#bbsbls",
   new AssertionMethodPurpose()
 );
 console.log("Verifiable Credential Signed", vc);
 ```
 
-### 5. Prueba tu código
-Para probar tu codigo deberás llamar a la funcion credential.
-```
+### 5. Test your code
+
+To test your code, you'll need to call the credential function.
+
+```typescript
 credential();
 ```
 
-Si seguiste bien los pasos deberías tener un archivo credential.ts como el siguiente:
-```
+If you followed the steps correctly, you should have a credential.ts file like the following:
+
+```typescript
 import { VerifiableCredentialService } from "@quarkid/vc-core";
 import { KMSClient } from "@quarkid/kms-client";
 import { LANG, Suite } from "@quarkid/kms-core";
@@ -543,37 +574,39 @@ const credential = async () => {
 };
 credential();
 ```
-> [!NOTE]
-> Recuerda que siempre debes probar con el DID creado en la seccion Creacion de un DID, esto es porque para firmar la credencial busca las claves guardadas en el storage que creaste.
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-El próximo paso es ejecutar la funcion credential, para ello abre una terminal y usa ts-node ó npx para ejecutar tu código.
+> [!NOTE]
+> Remember that you should always test with the DID created in the Creating a DID section, this is because to sign the credential it looks for the keys stored in the storage you created.
+
+The next step is to execute the credential function. To do this, open a terminal and use ts-node or npx to run your code.
+
 ```
 ts-node credential.ts
 npx ts-node credential.ts
 ```
 
-En tu terminal verás el resultado de los console.log que tienes en tu código, es decir, verás una credencial creada y luego la misma credencial pero firmada.
+In your terminal, you will see the result of the console.log statements in your code, that is, you will see a created credential and then the same credential but signed.
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-### Verificación de una VC
+## Verification of a VC
 
-### 1. Instala el siguiente paquete NPMJs:
+### 1. Install the following NPMJs package:
 
 ```
 npm install @quarkid/vc-verifier @quarkid/did-resolver
 ```
 
-### 2. Verifica
+### 2. Verify
 
-Para verificar la credencial usaremos el servicio VcVerifierService. A este servicio necesitamos pasarle un callback para resolver el DID que sera la misma funcion utilizada en la sección Resuelve.
+To verify the credential, we will use the VcVerifierService. We need to pass this service a callback to resolve the DID, which will be the same function used in the Resolve section.
 
-En la funcion credential que creaste en el paso anterior agrega el siguiente codigo:
-```
+In the credential function you created in the previous step, add the following code:
+
+```typescript
 import { VCVerifierService } from "@quarkid/vc-verifier";
 import { DIDUniversalResolver } from "@quarkid/did-resolver";
 ```
-```
+
+```typescript
 const QuarkIDEndpoint = "https://node-ssi.buenosaires.gob.ar";
 
 const service = new VCVerifierService({
@@ -589,51 +622,52 @@ const service = new VCVerifierService({
 });
 const result = await service.verify(vc, new AssertionMethodPurpose());
 console.log("result", result);
-
 ```
-Resolvemos el Did Document y llamamos a la funcion verificadora, la cual recibe la credencial y el proposito, que en este caso es Assertion Method que es aquel que se usa para el caso de verificacion de credenciales.
 
-La variable result devuelve true si verifica correctamente, o false con un resultado de error si falló la verificacion.
+We resolve the DID Document and call the verification function, which receives the credential and the purpose, which in this case is Assertion Method, which is the one used for credential verification.
 
-### 3. Prueba
+The result variable returns true if it verifies correctly, or false with an error result if the verification failed.
+
+### 3. Test
+
 ```
 ts-node credential.ts
 ```
 
-o
+or
+
 ```
 npx ts-node credential.ts
 ```
 
-------------------------------------------------------------------------------------------------------------
+## Generation of Test Credential with QR code
 
-## Generación de Credencial de pruebas con código QR
+1. Clone the [Demo](https://github.com/ssi-quarkid/Quickstart-Emision-Verificacion-de-Vcs/tree/main/demo) file
 
-1. Clonar el archivo [Demo](https://github.com/gcba/Quickstart-Emision-Verificacion-de-Vcs/tree/master/demo)
+2. Remove the following files from the solution:
 
-2. Eliminar de la solucion los archivos:
+- issuer-secure-storage-ws.json
+- issuer-storage-ws.json
+- waci-protocol-ws.json
 
-* issuer-secure-storage-ws.json
-* issuer-storage-ws.json
-* waci-protocol-ws.json
+Since a new DID will be generated, they will be automatically regenerated when running the project.
 
-Ya que se va a generar un nuevo DID, se volverán a generar automaticamente al ejecutar el proyecto.
+### Prerequisites:
 
-### Pre-requisitos: 
-Se requiere tener instalado ngrok para ello ejecutar npm i ngrok -g en una nueva Terminal, 
-diferente a la que se va a usar para ejecutar el proyecto.
+You need to have ngrok installed. To do this, run npm i ngrok -g in a new Terminal,
+different from the one you're going to use to run the project.
 
-Se debe descargar la wallet QuarkID en un dispositivo mobile [iOS](https://apps.apple.com/ar/app/quarkid/id6450680088) o [Android](https://play.google.com/store/apps/details?id=com.quarkid). 
+You must download the QuarkID wallet on a mobile device [iOS](https://apps.apple.com/ar/app/quarkid/id6450680088) or [Android](https://play.google.com/store/apps/details?id=com.quarkid).
 
-### Pasos
+### Steps
 
-1. En la consola en la cual esta ejecutando ngrok, se debe ejecutar lo siguiente:
+1. In the console where you're running ngrok, you should execute the following:
 
 ```
 ngrok http 3010
 ```
 
-2. Se verá en la consola:
+2. You will see in the console:
 
 ```
 Full request capture now available in your browser: https://ngrok.com/r/ti
@@ -648,48 +682,33 @@ Forwarding                    https://248c-161-22-25-244.ngrok-free.app -> http:
 Connections                   ttl     opn     rt1     rt5     p50     p90
 ```
 
-3. Copiar la url que se visualiza en "Forwarding" en este ejemplo es "https://248c-161-22-25-244.ngrok-free.app"
-y pegarla en el archivo "app.module.ts" en la linea 47 donde dice "serviceEndpoint"
+3. Copy the URL shown in "Forwarding", in this example it's "https://248c-161-22-25-244.ngrok-free.app"
+   and paste it in the "app.module.ts" file on line 47 where it says "serviceEndpoint"
 
+4. Save the changes
 
-4. Guardar los cambios
-
-5. Ejecutar en otra consola que no sea la que se utilizó para ngrok:
+5. Run in another console that is not the one used for ngrok:
 
 ```
 yarn
 ```
-para descargar las dependencias.
 
-6. Luego ejecutar un:
+to download the dependencies.
+
+6. Then run:
 
 ```
 yarn start
 ```
 
-Se puede navegar la url http://localhost:3010/invitation-message y se visualizará:
+You can navigate to the URL http://localhost:3010/invitation-message and you will see:
 
 ```
 {"invitationId":"135204a7-91d2-4ff2-9352-9cc6d4f91272","invitationContent":"didcomm://?_oob=eyJ0eXBlIjoiaHR0cHM6Ly9kaWRjb21tLm9yZy9vdXQtb2YtYmFuZC8yLjAvaW52aXRhdGlvbiIsImlkIjoiMTM1MjA0YTctOTFkMi00ZmYyLTkzNTItOWNjNmQ0ZjkxMjcyIiwiZnJvbSI6ImRpZDpxdWFya2lkOkVpQ25pekFscVNWOXEzUHFEbGZUTVpzcV9LRUQ1Qm50OG1nelJIYmlsMEc4RmciLCJib2R5Ijp7ImdvYWxfY29kZSI6InN0cmVhbWxpbmVkLXZjIiwiYWNjZXB0IjpbImRpZGNvbW0vdjIiXX19"}
 ```
 
-- El contenido de "invitationContent" (lo que esta dentro de las comillas despues de los ":")
-- Es el codigo que se utiliza para dibujar el QR
-- Ese codigo se puede pegar en cualquier web de generacion de QR, sugerimos (QR Code Generator)[https://www.the-qrcode-generator.com/]
+- The content of "invitationContent" (what's inside the quotes after the ":")
+- Is the code used to draw the QR
+- This code can be pasted into any QR generation website, we suggest [QR Code Generator](https://www.the-qrcode-generator.com/)
 
-7. Seleccionar la opcion Texto Plano, pegar el contenido y se dibuja el QR para poder escanearlo con la wallet de Quarkid de Producción, disponible en los Stores de los Sistemas Operativos. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+7. Select the Plain Text option, paste the content, and the QR is drawn to be scanned with the Production Quarkid wallet, available in the Operating Systems' Stores.
